@@ -35,20 +35,23 @@ cat /proc/cpuinfo
 # Núcleos: 3
 # Hilos: 3
 # Caché: 512 KB
----
+ ```
+
+<img width="1301" height="811" alt="Captura de pantalla 2026-03-05 130905" src="https://github.com/user-attachments/assets/f6c0132e-6c3d-487b-8220-33c54ff812f4" />
 
 
 
-##2. Actualización inicial del sistema
+## 2. Actualización inicial del sistema
 
 Antes de instalar herramientas se actualizó el sistema:
 
 sudo apt update
 sudo apt upgrade -y
 
-Salida esperada: lista de paquetes actualizados, sin errores.
+<img width="635" height="63" alt="image" src="https://github.com/user-attachments/assets/dfcb97c2-a541-4b5a-bd30-6a3dbfe5a395" />
 
-##3. Instalación de herramientas esenciales
+
+## 3. Instalación de herramientas esenciales
 
 Decidí empezar por instalar herramientas antes de configurar sudo y otros parámetros porque quería documentar todo el proceso desde la VM en tiempo real, sin depender de la configuración de usuarios.
 
@@ -78,19 +81,20 @@ eza --version
 plocate foo
 figlet Hola
 tmux -V
-##4. Configuración de Git en la VM
+
+<img width="1307" height="73" alt="image" src="https://github.com/user-attachments/assets/9f9c4bf0-7d0d-4531-9c86-0994ddcc4aeb" />
+
+
+## 4. Configuración de Git en la VM
 
 Se configuró Git con usuario y correo:
-
 git config --global user.name "IDBC77"
 git config --global user.email "ignacio.dorado@live.u-tad.com"
 git config --list
 
-Salida esperada:
+<img width="1109" height="438" alt="image" src="https://github.com/user-attachments/assets/bd1097d5-7ada-40ce-88d5-d459778d9f96" />
 
-user.name=IDBC77
-user.email=ignacio.dorado@live.u-tad.com
-##5. Creación de repositorio local y estructura de documentación
+## 5. Creación de repositorio local y estructura de documentación
 cd ~
 mkdir asir-lab-ubuntu-docker
 cd asir-lab-ubuntu-docker
@@ -104,7 +108,9 @@ touch docs/04-creacion-pruebas-snapshots.md
 mkdir docs/img
 git add .
 git commit -m "Estructura inicial de la documentación"
-##6. Configuración del repositorio remoto y token de autenticación
+<img width="1303" height="705" alt="image" src="https://github.com/user-attachments/assets/81d3cab0-0be1-49a3-85dc-ede75488ddb6" />
+
+## 6. Configuración del repositorio remoto y token de autenticación
 
 En GitHub se creó un Personal Access Token (PAT) con permisos repo para poder hacer push desde la VM.
 
@@ -121,5 +127,9 @@ Push al remoto usando el token como contraseña:
 
 git push -u origin main
 
+
 Con esto la VM y GitHub quedaron sincronizados y la documentación inicial está disponible remotamente.
+<img width="1191" height="299" alt="image" src="https://github.com/user-attachments/assets/e23b0152-efb8-41e1-83e4-422b19734e86" />
+<img width="1289" height="466" alt="image" src="https://github.com/user-attachments/assets/064c2215-2775-4afd-98e8-335d63e3d696" />
+
 
