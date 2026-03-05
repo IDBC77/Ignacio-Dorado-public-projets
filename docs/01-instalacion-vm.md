@@ -112,7 +112,7 @@ git commit -m "Estructura inicial de la documentación"
 
 ## 6. Configuración del repositorio remoto y token de autenticación
 
-En GitHub se creó un Personal Access Token (PAT) con permisos repo para poder hacer push desde la VM.
+En GitHub se creó un Personal Access Token (PAT) con permisos repo para poder hacer push desde la VM. 
 
 Se configuró el remoto:
 
@@ -129,7 +129,49 @@ git push -u origin main
 
 
 Con esto la VM y GitHub quedaron sincronizados y la documentación inicial está disponible remotamente.
+
+
 <img width="1191" height="299" alt="image" src="https://github.com/user-attachments/assets/e23b0152-efb8-41e1-83e4-422b19734e86" />
+
+
 <img width="1289" height="466" alt="image" src="https://github.com/user-attachments/assets/064c2215-2775-4afd-98e8-335d63e3d696" />
+
+
+## 7. Configuración de sudo y seguridad
+
+Antes de modificar permisos, se crea una carpeta de seguridad por si algo falla:
+
+```bash
+sudo mkdir -p /root/backup_sudo
+sudo chmod 700 /root/backup_sudo
+sudo cp /etc/sudoers /root/backup_sudo/sudoers.bak
+sudo cp -r /etc/sudoers.d /root/backup_sudo/sudoers.d.bak
+sudo adduser idbc
+sudo usermod -aG sudo idbc
+sudo visudo
+# Usuario regular con permisos sudo
+idbc ALL=(ALL:ALL) ALL
+su - idbc
+sudo whoami
+```
+<img width="1271" height="723" alt="Captura de pantalla 2026-03-05 133042" src="https://github.com/user-attachments/assets/88e33ac6-8e03-47b9-96b4-28602533c48b" />
+
+<img width="1624" height="927" alt="Captura de pantalla 2026-03-05 142747" src="https://github.com/user-attachments/assets/f5dab95d-aecf-4d26-b38e-469899bb662f" />
+
+<img width="1288" height="746" alt="Captura de pantalla 2026-03-05 143331" src="https://github.com/user-attachments/assets/9314484e-474d-450d-8099-3036014b4b00" />
+
+<img width="682" height="127" alt="Captura de pantalla 2026-03-05 144409" src="https://github.com/user-attachments/assets/6aea5abc-17c4-4d8c-b893-bc4b12389db4" />
+
+<img width="1530" height="327" alt="Captura de pantalla 2026-03-05 144419" src="https://github.com/user-attachments/assets/aae2de6c-ad96-4139-b3e1-4188d9f35f69" />
+
+<img width="986" height="306" alt="Captura de pantalla 2026-03-05 144730" src="https://github.com/user-attachments/assets/47366a6b-a8ab-4286-9f53-bdaad34352ca" />
+
+<img width="1526" height="580" alt="Captura de pantalla 2026-03-05 145055" src="https://github.com/user-attachments/assets/8a9ed1a6-127a-4367-9ce2-fe61ac2a638c" />
+
+
+
+
+
+
 
 
