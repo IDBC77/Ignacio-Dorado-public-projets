@@ -35,9 +35,11 @@ cat /proc/cpuinfo
 # Núcleos: 3
 # Hilos: 3
 # Caché: 512 KB
+---
 
 
-2. Actualización inicial del sistema
+
+##2. Actualización inicial del sistema
 
 Antes de instalar herramientas se actualizó el sistema:
 
@@ -46,7 +48,7 @@ sudo apt upgrade -y
 
 Salida esperada: lista de paquetes actualizados, sin errores.
 
-3. Instalación de herramientas esenciales
+##3. Instalación de herramientas esenciales
 
 Decidí empezar por instalar herramientas antes de configurar sudo y otros parámetros porque quería documentar todo el proceso desde la VM en tiempo real, sin depender de la configuración de usuarios.
 
@@ -76,7 +78,7 @@ eza --version
 plocate foo
 figlet Hola
 tmux -V
-4. Configuración de Git en la VM
+##4. Configuración de Git en la VM
 
 Se configuró Git con usuario y correo:
 
@@ -88,7 +90,7 @@ Salida esperada:
 
 user.name=IDBC77
 user.email=ignacio.dorado@live.u-tad.com
-5. Creación de repositorio local y estructura de documentación
+##5. Creación de repositorio local y estructura de documentación
 cd ~
 mkdir asir-lab-ubuntu-docker
 cd asir-lab-ubuntu-docker
@@ -102,7 +104,7 @@ touch docs/04-creacion-pruebas-snapshots.md
 mkdir docs/img
 git add .
 git commit -m "Estructura inicial de la documentación"
-6. Configuración del repositorio remoto y token de autenticación
+##6. Configuración del repositorio remoto y token de autenticación
 
 En GitHub se creó un Personal Access Token (PAT) con permisos repo para poder hacer push desde la VM.
 
@@ -120,3 +122,4 @@ Push al remoto usando el token como contraseña:
 git push -u origin main
 
 Con esto la VM y GitHub quedaron sincronizados y la documentación inicial está disponible remotamente.
+
