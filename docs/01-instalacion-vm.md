@@ -179,32 +179,79 @@ sudo fdisk -l
 
 
 <img width="1624" height="927" alt="Captura de pantalla 2026-03-05 142747" src="https://github.com/user-attachments/assets/f5dab95d-aecf-4d26-b38e-469899bb662f" />
-
+## 9 Creación de red y servicio ssh
 ### 9.1 Configuración de red de la VM
 
-La VM Ubuntu tiene dos adaptadores de red configurados en VirtualBox:
-
-enp0s3 (Bridge)
-
- Conecta la VM directamente a la red física del host.
- IP asignada: 192.168.1.56.
- Permite comunicación con otros dispositivos de la red, incluido el host Windows.
-
-enp0s8 (NAT)
-
- Red privada de VirtualBox.
- IP asignada: 192.168.7.77.
- Permite acceso a Internet desde la VM, pero no es accesible desde el host físico.
-
 <img width="1288" height="746" alt="Captura de pantalla 2026-03-05 143331" src="https://github.com/user-attachments/assets/9314484e-474d-450d-8099-3036014b4b00" />
+
+La VM de Ubuntu tiene **dos adaptadores de red** configurados en VirtualBox:
+
+1. **enp0s3 – Bridge**
+   - Conecta la VM directamente a la red física del host.
+   - IP asignada: `192.168.1.56`.
+   - Permite comunicación bidireccional con otros dispositivos de la red, incluido el host Windows.
+
+2. **enp0s8 – NAT**
+   - Red privada de VirtualBox.
+   - IP asignada: `192.168.7.77`.
+   - Permite acceso a Internet desde la VM, pero **no es accesible desde el host físico**.
+
+---
+
+### Comprobación de la conectividad
+
+Desde la VM:
+
+```bash
+ip a
+# enp0s3: 192.168.1.56/24
+# enp0s8: 192.168.7.77/24
+
+ping 8.8.8.8
+# Paquetes enviados y recibidos correctamente -> salida a Internet OK
+
+ping 192.168.1.40
+# 100% de pérdida -> la VM no puede hacer ping al host a través de enp0s3
+```
+
+Desde el host Windows:
+
+ping 192.168.1.56
+Respuesta positiva -> el host sí puede comunicarse con la VM
+
 
 
 <img width="1526" height="580" alt="Captura de pantalla 2026-03-05 145055" src="https://github.com/user-attachments/assets/8a9ed1a6-127a-4367-9ce2-fe61ac2a638c" />
 
+### 9.2 Configuración y pruebas de SSH
+
+Se configuró el servicio SSH en la VM cambiando el **puerto por defecto 22 al 2222**.  
+Se crearon los usuarios `root` e `IDBC`, ambos con permisos `sudo`. Además, se realizó copia de seguridad de los archivos de configuración de sudo y SSH por seguridad.
+
+---
+
+### Verificación del servicio SSH en la VM
+
+```bash
+sudo systemctl status ssh
+# Active: active (running)
+
+# Desde el host de windows
+C:\Windows\System32>ssh -p 2222 idbc@192.168.1.56
+
+```
+
+<img width="1623" height="1060" alt="image" src="https://github.com/user-attachments/assets/7e0003c3-f4f2-4757-903d-38f9a87ceef0" />
 
 
 
+## 10. Instalación y prueba de Docker en la VM
 
+En este punto se instala Docker en la VM de Ubuntu 24.04 y se realiza una prueba básica para verificar su correcto funcionamiento.
+
+### 10.1 Instalación de Docker
+
+Actualizar el sistema:
 
 
 
