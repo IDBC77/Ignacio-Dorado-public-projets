@@ -247,11 +247,92 @@ C:\Windows\System32>ssh -p 2222 idbc@192.168.1.56
 
 ## 10. Instalación y prueba de Docker en la VM
 
-En este punto se instala Docker en la VM de Ubuntu 24.04 y se realiza una prueba básica para verificar su correcto funcionamiento.
+En este punto se instala Docker en la VM de Ubuntu 24.04 y se realizan pruebas básicas para confirmar que funciona correctamente.
 
-### 10.1 Instalación de Docker
+> Nota: Docker permite la creación y ejecución de contenedores, que son entornos aislados para ejecutar aplicaciones. Esta instalación se hará para el usuario regular `IDBC`.
 
-Actualizar el sistema:
+---
+
+### 10.1 Preparación del sistema
+
+Antes de instalar Docker, se actualiza el sistema y se instalan paquetes necesarios:
+
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y ca-certificates curl gnupg lsb-release
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+docker --version
+docker compose version
+sudo usermod -aG docker idbc
+newgrp docker
+docker ps
+```
+<img width="1534" height="903" alt="image" src="https://github.com/user-attachments/assets/f91bd122-67d0-4174-af32-edf613a44d03" />
+
+### 10.2
+```bash
+# Crear red bridge personalizada
+docker network create \
+  --driver bridge \
+  laboratorio-net
+
+# Comprobar redes existentes
+docker network ls
+
+# Conectar un contenedor a la red
+docker run -dit --name cont1 --network laboratorio-net nginx
+docker run -dit --name cont2 --network laboratorio-net alpine sleep 1000
+
+# Verificar conectividad entre contenedores
+docker exec -it cont2 ping cont1
+```
+<img width="1539" height="892" alt="image" src="https://github.com/user-attachments/assets/11e4cdae-776b-4ddd-9a66-b22a6ea1d26d" />
+
+
+## 11. Snapshots de las VMs: Creación y pruebas de restauración
+
+En este punto se documenta la **creación de snapshots** de las máquinas virtuales y la prueba de restauración para asegurar la integridad del entorno y poder recuperar estados previos en caso de fallo.
+
+> Nota: Los snapshots permiten guardar el estado completo de una VM (disco, memoria, configuración) y restaurarlo posteriormente. Esto es fundamental antes de realizar cambios críticos como instalaciones, configuraciones de red o pruebas de Docker.
+
+---
+
+### 11.1 Creación de un snapshot
+
+1. Abrir **Oracle VirtualBox** y seleccionar la VM deseada.
+2. Ir a la sección **Snapshots** en el panel derecho.
+3. Pulsar **Tomar Snapshot** (Take Snapshot).
+4. Asignar un nombre descriptivo y opcionalmente un comentario, por ejemplo:
+5. Confirmar. El snapshot se crea y VirtualBox guarda automáticamente el estado actual.
+
+> El snapshot incluye: disco virtual, memoria RAM, estado de dispositivos y configuración de la VM.
+
+---
+
+### 11.2 Pruebas de restauración
+
+Para probar que los snapshots funcionan correctamente:
+
+1. Seleccionar el snapshot deseado en la sección **Snapshots**.
+2. Pulsar **Restaurar** (Restore Snapshot).
+3. Confirmar. VirtualBox devolverá la VM exactamente al estado guardado en el snapshot.
+4. Arrancar la VM y comprobar que todo funciona como antes:
+
+```bash
+# Comprobaciones básicas tras restauración:
+hostname
+docker ps
+ip a
+```
+
+
 
 
 
