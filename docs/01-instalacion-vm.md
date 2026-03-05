@@ -156,17 +156,51 @@ sudo whoami
 ```
 <img width="1271" height="723" alt="Captura de pantalla 2026-03-05 133042" src="https://github.com/user-attachments/assets/88e33ac6-8e03-47b9-96b4-28602533c48b" />
 
-<img width="1624" height="927" alt="Captura de pantalla 2026-03-05 142747" src="https://github.com/user-attachments/assets/f5dab95d-aecf-4d26-b38e-469899bb662f" />
-
-<img width="1288" height="746" alt="Captura de pantalla 2026-03-05 143331" src="https://github.com/user-attachments/assets/9314484e-474d-450d-8099-3036014b4b00" />
-
 <img width="682" height="127" alt="Captura de pantalla 2026-03-05 144409" src="https://github.com/user-attachments/assets/6aea5abc-17c4-4d8c-b893-bc4b12389db4" />
 
 <img width="1530" height="327" alt="Captura de pantalla 2026-03-05 144419" src="https://github.com/user-attachments/assets/aae2de6c-ad96-4139-b3e1-4188d9f35f69" />
 
 <img width="986" height="306" alt="Captura de pantalla 2026-03-05 144730" src="https://github.com/user-attachments/assets/47366a6b-a8ab-4286-9f53-bdaad34352ca" />
 
+## 8. Particionado y montaje del disco de datos
+
+Este apartado recoge **el proceso de añadir un segundo disco (`sdb`)**, crear una partición para datos y montarla automáticamente en `/data`.  
+
+> Nota: Este disco se utiliza exclusivamente para almacenar datos y mantener separado el sistema (`sda`) de los archivos de usuario y repositorios.  
+
+---
+
+### 8.1 Comprobación de discos disponibles
+
+```bash
+lsblk
+sudo fdisk -l
+```
+
+
+<img width="1624" height="927" alt="Captura de pantalla 2026-03-05 142747" src="https://github.com/user-attachments/assets/f5dab95d-aecf-4d26-b38e-469899bb662f" />
+
+### 9.1 Configuración de red de la VM
+
+La VM Ubuntu tiene dos adaptadores de red configurados en VirtualBox:
+
+enp0s3 (Bridge)
+
+ Conecta la VM directamente a la red física del host.
+ IP asignada: 192.168.1.56.
+ Permite comunicación con otros dispositivos de la red, incluido el host Windows.
+
+enp0s8 (NAT)
+
+ Red privada de VirtualBox.
+ IP asignada: 192.168.7.77.
+ Permite acceso a Internet desde la VM, pero no es accesible desde el host físico.
+
+<img width="1288" height="746" alt="Captura de pantalla 2026-03-05 143331" src="https://github.com/user-attachments/assets/9314484e-474d-450d-8099-3036014b4b00" />
+
+
 <img width="1526" height="580" alt="Captura de pantalla 2026-03-05 145055" src="https://github.com/user-attachments/assets/8a9ed1a6-127a-4367-9ce2-fe61ac2a638c" />
+
 
 
 
