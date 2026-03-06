@@ -162,6 +162,11 @@ sudo whoami
 
 <img width="986" height="306" alt="Captura de pantalla 2026-03-05 144730" src="https://github.com/user-attachments/assets/47366a6b-a8ab-4286-9f53-bdaad34352ca" />
 
+El usario sudo sería el original ignacioasir y el regular, aunque he entendido que este también tiene que tener privielgios de sudo sería idbc.
+
+<img width="592" height="603" alt="image" src="https://github.com/user-attachments/assets/5b96de9b-1013-4a68-b1aa-e8cc58531ba2" />
+
+
 ## 8. Particionado y montaje del disco de datos
 
 Este apartado recoge **el proceso de añadir un segundo disco (`sdb`)**, crear una partición para datos y montarla automáticamente en `/data`.  
@@ -179,7 +184,9 @@ sudo fdisk -l
 
 
 <img width="1624" height="927" alt="Captura de pantalla 2026-03-05 142747" src="https://github.com/user-attachments/assets/f5dab95d-aecf-4d26-b38e-469899bb662f" />
+
 ## 9 Creación de red y servicio ssh
+
 ### 9.1 Configuración de red de la VM
 
 <img width="1288" height="746" alt="Captura de pantalla 2026-03-05 143331" src="https://github.com/user-attachments/assets/9314484e-474d-450d-8099-3036014b4b00" />
@@ -233,6 +240,15 @@ Se crearon los usuarios `root` e `IDBC`, ambos con permisos `sudo`. Además, se 
 ### Verificación del servicio SSH en la VM
 
 ```bash
+sudo nano /etc/ssh/sshd_config
+# Aquií es donde habría que configurar el puerto del servicio descomentando Port 22 y cambiandolo 
+sudo ufw allow 2222/tcp
+
+sudo ufw reload
+
+sudo systemctl restart ssh
+
+sudo systemctl status ssh
 sudo systemctl status ssh
 # Active: active (running)
 
@@ -240,6 +256,8 @@ sudo systemctl status ssh
 C:\Windows\System32>ssh -p 2222 idbc@192.168.1.56
 
 ```
+<img width="811" height="416" alt="image" src="https://github.com/user-attachments/assets/0ac34cad-cea6-4878-a202-e6cd916cbdde" />
+
 
 <img width="1623" height="1060" alt="image" src="https://github.com/user-attachments/assets/7e0003c3-f4f2-4757-903d-38f9a87ceef0" />
 
@@ -331,6 +349,7 @@ hostname
 docker ps
 ip a
 ```
+
 
 
 
