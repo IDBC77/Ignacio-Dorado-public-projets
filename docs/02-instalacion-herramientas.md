@@ -118,3 +118,59 @@ docker ps
 
 
 <img width="1899" height="976" alt="image" src="https://github.com/user-attachments/assets/8b02fcf1-0cb5-4249-944c-8407c8f979bf" />
+
+Lo primero decir que añadir stacks sólo se puede desde la maquina donde tienes el contenedor docker, lo cual tiene sentido.
+
+<img width="1899" height="1010" alt="image" src="https://github.com/user-attachments/assets/79e76796-d847-47c3-a844-d0bccf923b73" />
+<img width="1525" height="818" alt="image" src="https://github.com/user-attachments/assets/ee3480d6-df63-46ce-a000-10cd4d079d87" />
+
+version: '3.9'
+
+services:
+
+  wordpress:
+    image: wordpress:latest
+    container_name: wp_frontend
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_pass
+      WORDPRESS_DB_NAME: wp_db
+    volumes:
+      - wp_data:/var/www/html
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: wp_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pass
+      MYSQL_DATABASE: wp_db
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_pass
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  wp_data:
+  db_data:
+
+  <img width="1608" height="959" alt="image" src="https://github.com/user-attachments/assets/daf8b39b-cd9d-4f0b-b211-2b54f2e7319f" />
+
+  
+<img width="1563" height="865" alt="image" src="https://github.com/user-attachments/assets/7a856c13-19e6-4a57-bd58-ca9bf6168be5" />
+
+<img width="1554" height="792" alt="image" src="https://github.com/user-attachments/assets/afcd1e17-f419-4912-b1a7-1ce10ff0db8f" />
+
+<img width="727" height="631" alt="image" src="https://github.com/user-attachments/assets/0a072159-01af-4651-bd90-d42ec93ec154" />
+
+<img width="1919" height="1043" alt="image" src="https://github.com/user-attachments/assets/07e4b593-1d9f-4553-9c4c-3eefd78370ec" />
+
+
+
+
