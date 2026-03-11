@@ -168,8 +168,116 @@ volumes:
 <img width="1554" height="792" alt="image" src="https://github.com/user-attachments/assets/afcd1e17-f419-4912-b1a7-1ce10ff0db8f" />
 
 <img width="727" height="631" alt="image" src="https://github.com/user-attachments/assets/0a072159-01af-4651-bd90-d42ec93ec154" />
+aso 1 — Desplegar MySQL en VM2
+
+Crear el directorio del proyecto:
+
+mkdir -p ~/docker/mysql_wordpress
+cd ~/docker/mysql_wordpress
+
+Crear el fichero docker-compose.yml:
+
+nano docker-compose.yml
+
+Contenido del archivo:
+
+services:
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pass
+      MYSQL_DATABASE: wp_db
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
+
+Desplegar el contenedor:
+
+docker compose up -d
+
+Verificar que el contenedor está activo:
+
+docker ps
+Paso 2 — Obtener la IP de VM2
+
+En VM2 ejecutar:
+
+ip a
+
+Ejemplo:
+
+192.168.1.58
+
+Esta IP será usada por WordPress para conectarse a MySQL.
+
+Paso 3 — Desplegar WordPress en VM1
+
+Crear el directorio:
+
+mkdir -p ~/docker/wp_frontend
+cd ~/docker/wp_frontend
+
+Crear el archivo de configuración:
+
+nano docker-compose.yml
+
+Contenido:
+
+services:
+
+  wordpress:
+    image: wordpress:latest
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: 192.168.1.58:3306
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_pass
+      WORDPRESS_DB_NAME: wp_db
+    volumes:
+      - wp_data:/var/www/html
+
+volumes:
+  wp_data:
+
+Desplegar WordPress:
+
+docker compose up -d
+
+Comprobar contenedores:
+
+docker ps
+Paso 4 — Acceder a WordPress
+
+Desde el navegador acceder a:
+
+http://192.168.1.56:8080
+
+WordPress se conectará a la base de datos que está en VM2.
+
+Comprobación de conectividad entre VMs
+
+Desde VM1 comprobar conexión a MySQL:
+
+ping 192.168.1.58
+
+También se puede comprobar el puerto:
+
+nc -zv 192.168.1.58 3306
+
 
 <img width="1919" height="1043" alt="image" src="https://github.com/user-attachments/assets/07e4b593-1d9f-4553-9c4c-3eefd78370ec" />
+
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/ce331cb5-4683-4f2c-9049-1c9903291ade" />
 
 
 
