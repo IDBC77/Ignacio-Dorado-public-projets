@@ -282,3 +282,8 @@ nc -zv 192.168.1.58 3306
 
 
 
+<img width="1901" height="955" alt="image" src="https://github.com/user-attachments/assets/fdaa7ecd-acd2-4379-a334-5ba0ad23380a" />
+
+<img width="1913" height="950" alt="image" src="https://github.com/user-attachments/assets/435e55ff-28ee-4597-be63-5e363b57e09d" />
+
+
