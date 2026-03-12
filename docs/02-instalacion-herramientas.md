@@ -373,4 +373,83 @@ Visualizar CPU, RAM, disco y otros recursos de VM2.
 <img width="1913" height="950" alt="image" src="https://github.com/user-attachments/assets/435e55ff-28ee-4597-be63-5e363b57e09d" />
 
 
+1. Preparación del entorno
 
+VM1: IP 192.168.1.56, funciona como servidor iPerf3
+
+VM2: Cliente iPerf3
+
+Logs y resultados guardados en /data/iperf/logs para no llenar el disco principal
+
+sudo mkdir -p /data/iperf/logs
+sudo chown $USER:$USER /data/iperf/logs
+2. Instalación de iPerf3
+sudo apt update
+sudo apt install -y iperf3
+iperf3 --version
+3. Configuración VM1 como servidor
+iperf3 -s -D --logfile /data/iperf/logs/iperf_server.log
+
+-s → servidor
+
+-D → daemon, corre en segundo plano
+
+--logfile → guardar salida en archivo
+
+4. Pruebas desde VM2 (cliente)
+4.1 Prueba básica (1 flujo, 30 segundos)
+iperf3 -c 192.168.1.56 -t 30 -P 1 --logfile /data/iperf/logs/iperf_client_1.log
+
+Resultado relevante:
+
+[  6]   0.00-30.00  sec  3.04 GBytes   871 Mbits/sec  1485             sender
+[  6]   0.00-30.01  sec  3.04 GBytes   870 Mbits/sec                  receiver
+
+Comentario: La conexión alcanza ~870 Mbits/s en un solo flujo, lo que indica un rendimiento muy estable entre VM1 y VM2.
+
+4.2 Diferentes tamaños de paquetes (64K, 128K, 256K)
+iperf3 -c 192.168.1.56 -l 64K  -t 30 -P 2 --logfile /data/iperf/logs/iperf_client_64K.log
+iperf3 -c 192.168.1.56 -l 128K -t 30 -P 2 --logfile /data/iperf/logs/iperf_client_128K.log
+iperf3 -c 192.168.1.56 -l 256K -t 30 -P 2 --logfile /data/iperf/logs/iperf_client_256K.log
+
+Comentario: Probar distintos tamaños de paquete permite observar cómo cambia la eficiencia del enlace. Paquetes más grandes suelen reducir la sobrecarga del protocolo y aumentar la tasa efectiva.
+
+4.3 Modo Reverse (servidor envía, cliente recibe)
+iperf3 -c 192.168.1.56 -R -t 30 -P 2 --logfile /data/iperf/logs/iperf_client_reverse.log
+
+Comentario: Útil para medir la velocidad de subida desde el servidor hacia el cliente. Comparando con la prueba estándar se puede ver la simetría del enlace.
+
+4.4 Pruebas concurrentes (4 flujos simultáneos)
+iperf3 -c 192.168.1.56 -P 4 -t 20 --logfile /data/iperf/logs/iperf_concurrent1.log &
+iperf3 -c 192.168.1.56 -P 4 -t 20 --logfile /data/iperf/logs/iperf_concurrent2.log &
+
+Comentario: Permite analizar la capacidad total del enlace con múltiples flujos. Útil para simular tráfico real de varias aplicaciones simultáneas.
+
+4.5 Logs de resultados
+
+Para extraer los datos más importantes:
+
+grep "sender" /data/iperf/logs/*.log
+grep "receiver" /data/iperf/logs/*.log
+
+Interpretación:
+
+sender → velocidad medida en el emisor (cliente o servidor según el modo)
+
+receiver → velocidad medida en el receptor
+
+Ejemplo de salida:
+
+/data/iperf/logs/iperf_client_1.log:[  6]   0.00-30.00  sec  3.04 GBytes   871 Mbits/sec  1485             sender
+/data/iperf/logs/iperf_client_1.log:[  6]   0.00-30.01  sec  3.04 GBytes   870 Mbits/sec                  receiver
+5. Conclusiones
+
+La velocidad promedio entre VM1 y VM2 es ~870 Mbits/s, estable y consistente.
+
+Incrementar el número de flujos o el tamaño de los paquetes ayuda a aprovechar mejor el enlace.
+
+El modo reverse permite verificar simetría y capacidad de subida.
+
+Guardar logs en un disco secundario evita saturar el disco principal y facilita la revisión de resultados.
+
+<img width="1916" height="943" alt="image" src="https://github.com/user-attachments/assets/88deb394-8c2a-4652-9983-e26db27c47a8" />
