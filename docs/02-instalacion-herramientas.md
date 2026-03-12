@@ -279,11 +279,98 @@ nc -zv 192.168.1.58 3306
 
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/ce331cb5-4683-4f2c-9049-1c9903291ade" />
 
+Configurar VM2 (Prometheus + Node Exporter)
 
+Crear carpeta del proyecto:
+
+mkdir ~/monitoring && cd ~/monitoring
+
+Crear docker-compose.yml:
+
+version: '3.9'
+
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  node_exporter:
+    image: prom/node-exporter
+    container_name: node_exporter
+    ports:
+      - "9100:9100"
+
+Crear prometheus.yml:
+
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['localhost:9100']
+
+Arrancar los contenedores:
+
+docker compose up -d
+
+Verificar:
+
+curl http://localhost:9100/metrics
+curl http://localhost:9090/-/ready
+2️ Configurar VM1 (Grafana)
+
+Crear carpeta y docker-compose.yml:
+
+version: '3.9'
+
+services:
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+
+Arrancar contenedor:
+
+docker compose up -d
+
+Acceder a Grafana en navegador:
+
+http://<IP_VM1>:3000
+
+Usuario: admin
+
+Contraseña: admin
+
+Añadir Prometheus como Data Source en Grafana:
+
+URL: http://<IP_VM2>:9090
+
+Guardar y probar conexión.
+
+3️ Crear Dashboard básico
+
+Crear un panel en Grafana.
+
+Seleccionar Prometheus como Data Source.
+
+Ejemplos de métricas:
+
+node_cpu_seconds_total
+node_memory_MemAvailable_bytes
+node_filesystem_avail_bytes
+
+Visualizar CPU, RAM, disco y otros recursos de VM2.
 
 
 <img width="1901" height="955" alt="image" src="https://github.com/user-attachments/assets/fdaa7ecd-acd2-4379-a334-5ba0ad23380a" />
 
 <img width="1913" height="950" alt="image" src="https://github.com/user-attachments/assets/435e55ff-28ee-4597-be63-5e363b57e09d" />
+
 
 
