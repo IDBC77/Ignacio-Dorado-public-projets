@@ -159,13 +159,9 @@ services:
 volumes:
   wp_data:
   db_data:
-
-  <img width="1608" height="959" alt="image" src="https://github.com/user-attachments/assets/daf8b39b-cd9d-4f0b-b211-2b54f2e7319f" />
-
   
-<img width="1563" height="865" alt="image" src="https://github.com/user-attachments/assets/7a856c13-19e6-4a57-bd58-ca9bf6168be5" />
+ <img width="1608" height="959" alt="image" src="https://github.com/user-attachments/assets/daf8b39b-cd9d-4f0b-b211-2b54f2e7319f" />
 
-<img width="1554" height="792" alt="image" src="https://github.com/user-attachments/assets/afcd1e17-f419-4912-b1a7-1ce10ff0db8f" />
 
 <img width="727" height="631" alt="image" src="https://github.com/user-attachments/assets/0a072159-01af-4651-bd90-d42ec93ec154" />
 aso 1 — Desplegar MySQL en VM2
@@ -274,8 +270,6 @@ También se puede comprobar el puerto:
 
 nc -zv 192.168.1.58 3306
 
-
-<img width="1919" height="1043" alt="image" src="https://github.com/user-attachments/assets/07e4b593-1d9f-4553-9c4c-3eefd78370ec" />
 
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/ce331cb5-4683-4f2c-9049-1c9903291ade" />
 
@@ -451,5 +445,5 @@ Incrementar el número de flujos o el tamaño de los paquetes ayuda a aprovechar
 El modo reverse permite verificar simetría y capacidad de subida.
 
 Guardar logs en un disco secundario evita saturar el disco principal y facilita la revisión de resultados.
-
 <img width="1916" height="943" alt="image" src="https://github.com/user-attachments/assets/88deb394-8c2a-4652-9983-e26db27c47a8" />
+
