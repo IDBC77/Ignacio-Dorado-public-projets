@@ -119,6 +119,8 @@ docker ps
 
 <img width="1899" height="976" alt="image" src="https://github.com/user-attachments/assets/8b02fcf1-0cb5-4249-944c-8407c8f979bf" />
 
+## 2.2 Portainer usando el docker-compose anterior
+
 Lo primero decir que añadir stacks sólo se puede desde la maquina donde tienes el contenedor docker, lo cual tiene sentido.
 
 <img width="1899" height="1010" alt="image" src="https://github.com/user-attachments/assets/79e76796-d847-47c3-a844-d0bccf923b73" />
@@ -164,18 +166,23 @@ volumes:
 
 
 <img width="727" height="631" alt="image" src="https://github.com/user-attachments/assets/0a072159-01af-4651-bd90-d42ec93ec154" />
-aso 1 — Desplegar MySQL en VM2
 
-Crear el directorio del proyecto:
+## 2.3 Desplegando Front de WP en VM1 y BD en VM2
+
+
+
+Paso 1 — Desplegar MySQL en VM2
+````bash
+#Crear el directorio del proyecto:
 
 mkdir -p ~/docker/mysql_wordpress
 cd ~/docker/mysql_wordpress
 
-Crear el fichero docker-compose.yml:
+#Crear el fichero docker-compose.yml:
 
 nano docker-compose.yml
 
-Contenido del archivo:
+#Contenido del archivo:
 
 services:
 
@@ -194,38 +201,37 @@ services:
 
 volumes:
   db_data:
-
-Desplegar el contenedor:
+# guardas y sales
+# Desplegar el contenedor:
 
 docker compose up -d
 
-Verificar que el contenedor está activo:
+#Verificar que el contenedor está activo:
 
 docker ps
+````
+
 Paso 2 — Obtener la IP de VM2
 
-En VM2 ejecutar:
-
+````bash
+#En VM2 ejecutar:
 ip a
-
-Ejemplo:
-
-192.168.1.58
-
+````
 Esta IP será usada por WordPress para conectarse a MySQL.
 
 Paso 3 — Desplegar WordPress en VM1
 
+````bash
 Crear el directorio:
 
 mkdir -p ~/docker/wp_frontend
 cd ~/docker/wp_frontend
 
-Crear el archivo de configuración:
+#Crear el archivo de configuración:
 
 nano docker-compose.yml
 
-Contenido:
+# Contenido:
 
 services:
 
@@ -245,14 +251,18 @@ services:
 volumes:
   wp_data:
 
-Desplegar WordPress:
+# Desplegar WordPress:
 
 docker compose up -d
 
-Comprobar contenedores:
+# Comprobar contenedores:
 
 docker ps
+
+````
+
 Paso 4 — Acceder a WordPress
+
 
 Desde el navegador acceder a:
 
@@ -261,25 +271,25 @@ http://192.168.1.56:8080
 WordPress se conectará a la base de datos que está en VM2.
 
 Comprobación de conectividad entre VMs
-
-Desde VM1 comprobar conexión a MySQL:
+````bash
+# Desde VM1 comprobar conexión a MySQL:
 
 ping 192.168.1.58
 
-También se puede comprobar el puerto:
+# También se puede comprobar el puerto:
 
 nc -zv 192.168.1.58 3306
-
+````
 
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/ce331cb5-4683-4f2c-9049-1c9903291ade" />
 
 Configurar VM2 (Prometheus + Node Exporter)
-
-Crear carpeta del proyecto:
+````bash
+#Crear carpeta del proyecto:
 
 mkdir ~/monitoring && cd ~/monitoring
 
-Crear docker-compose.yml:
+#Crear docker-compose.yml:
 
 version: '3.9'
 
@@ -298,7 +308,7 @@ services:
     ports:
       - "9100:9100"
 
-Crear prometheus.yml:
+#Crear prometheus.yml:
 
 global:
   scrape_interval: 15s
@@ -310,15 +320,15 @@ scrape_configs:
 
 Arrancar los contenedores:
 
-docker compose up -d
+# docker compose up -d
 
-Verificar:
+# Verificar:
 
 curl http://localhost:9100/metrics
 curl http://localhost:9090/-/ready
 2️ Configurar VM1 (Grafana)
 
-Crear carpeta y docker-compose.yml:
+# Crear carpeta y docker-compose.yml:
 
 version: '3.9'
 
@@ -329,9 +339,10 @@ services:
     ports:
       - "3000:3000"
 
-Arrancar contenedor:
+# Arrancar contenedor:
 
 docker compose up -d
+````
 
 Acceder a Grafana en navegador:
 
@@ -347,7 +358,7 @@ URL: http://<IP_VM2>:9090
 
 Guardar y probar conexión.
 
-3️ Crear Dashboard básico
+# 3️ Instalar Prometheus + Node exporter + Grafana
 
 Crear un panel en Grafana.
 
@@ -366,7 +377,7 @@ Visualizar CPU, RAM, disco y otros recursos de VM2.
 
 <img width="1913" height="950" alt="image" src="https://github.com/user-attachments/assets/435e55ff-28ee-4597-be63-5e363b57e09d" />
 
-
+# 4 Testear iPerf
 1. Preparación del entorno
 
 VM1: IP 192.168.1.56, funciona como servidor iPerf3
