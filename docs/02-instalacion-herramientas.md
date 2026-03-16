@@ -478,3 +478,4 @@ El modo reverse permite verificar simetría y capacidad de subida.
 Guardar logs en un disco secundario evita saturar el disco principal y facilita la revisión de resultados.
 <img width="1916" height="943" alt="image" src="https://github.com/user-attachments/assets/88deb394-8c2a-4652-9983-e26db27c47a8" />
 
+<img width="1866" height="967" alt="image" src="https://github.com/user-attachments/assets/9d412704-2822-4c99-bf83-5bca3073bbb1" />
