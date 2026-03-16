@@ -283,6 +283,8 @@ nc -zv 192.168.1.58 3306
 
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/ce331cb5-4683-4f2c-9049-1c9903291ade" />
 
+# 3️ Instalar Prometheus + Node exporter + Grafana
+
 Configurar VM2 (Prometheus + Node Exporter)
 ````bash
 #Crear carpeta del proyecto:
@@ -358,7 +360,7 @@ URL: http://<IP_VM2>:9090
 
 Guardar y probar conexión.
 
-# 3️ Instalar Prometheus + Node exporter + Grafana
+
 
 Crear un panel en Grafana.
 
@@ -385,48 +387,65 @@ VM1: IP 192.168.1.56, funciona como servidor iPerf3
 VM2: Cliente iPerf3
 
 Logs y resultados guardados en /data/iperf/logs para no llenar el disco principal
-
+````bash
 sudo mkdir -p /data/iperf/logs
 sudo chown $USER:$USER /data/iperf/logs
+````
+
 2. Instalación de iPerf3
+bash ````
 sudo apt update
 sudo apt install -y iperf3
 iperf3 --version
-3. Configuración VM1 como servidor
+````
+
+4. Configuración VM1 como servidor
+#bash
 iperf3 -s -D --logfile /data/iperf/logs/iperf_server.log
 
--s → servidor
+# -s → servidor
 
--D → daemon, corre en segundo plano
+# -D → daemon, corre en segundo plano
 
 --logfile → guardar salida en archivo
 
 4. Pruebas desde VM2 (cliente)
 4.1 Prueba básica (1 flujo, 30 segundos)
+````bash
 iperf3 -c 192.168.1.56 -t 30 -P 1 --logfile /data/iperf/logs/iperf_client_1.log
 
-Resultado relevante:
+# Resultado relevante:
 
-[  6]   0.00-30.00  sec  3.04 GBytes   871 Mbits/sec  1485             sender
-[  6]   0.00-30.01  sec  3.04 GBytes   870 Mbits/sec                  receiver
+# [  6]   0.00-30.00  sec  3.04 GBytes   871 Mbits/sec  1485             sender
+# [  6]   0.00-30.01  sec  3.04 GBytes   870 Mbits/sec                  receiver
 
-Comentario: La conexión alcanza ~870 Mbits/s en un solo flujo, lo que indica un rendimiento muy estable entre VM1 y VM2.
+# Comentario: La conexión alcanza ~870 Mbits/s en un solo flujo, lo que indica un rendimiento muy estable entre VM1 y VM2.
+````
 
 4.2 Diferentes tamaños de paquetes (64K, 128K, 256K)
+
+````bash
 iperf3 -c 192.168.1.56 -l 64K  -t 30 -P 2 --logfile /data/iperf/logs/iperf_client_64K.log
 iperf3 -c 192.168.1.56 -l 128K -t 30 -P 2 --logfile /data/iperf/logs/iperf_client_128K.log
 iperf3 -c 192.168.1.56 -l 256K -t 30 -P 2 --logfile /data/iperf/logs/iperf_client_256K.log
+````
 
 Comentario: Probar distintos tamaños de paquete permite observar cómo cambia la eficiencia del enlace. Paquetes más grandes suelen reducir la sobrecarga del protocolo y aumentar la tasa efectiva.
 
 4.3 Modo Reverse (servidor envía, cliente recibe)
+
+````bash
 iperf3 -c 192.168.1.56 -R -t 30 -P 2 --logfile /data/iperf/logs/iperf_client_reverse.log
+````
 
 Comentario: Útil para medir la velocidad de subida desde el servidor hacia el cliente. Comparando con la prueba estándar se puede ver la simetría del enlace.
 
 4.4 Pruebas concurrentes (4 flujos simultáneos)
+
+````bash
 iperf3 -c 192.168.1.56 -P 4 -t 20 --logfile /data/iperf/logs/iperf_concurrent1.log &
 iperf3 -c 192.168.1.56 -P 4 -t 20 --logfile /data/iperf/logs/iperf_concurrent2.log &
+````
 
 Comentario: Permite analizar la capacidad total del enlace con múltiples flujos. Útil para simular tráfico real de varias aplicaciones simultáneas.
 
@@ -434,9 +453,10 @@ Comentario: Permite analizar la capacidad total del enlace con múltiples flujos
 
 Para extraer los datos más importantes:
 
+````bash
 grep "sender" /data/iperf/logs/*.log
 grep "receiver" /data/iperf/logs/*.log
-
+````
 Interpretación:
 
 sender → velocidad medida en el emisor (cliente o servidor según el modo)
