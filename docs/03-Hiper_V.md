@@ -1,4 +1,4 @@
-# 1 Instalatación
+# 1 Instalación
 
 Es un paso sencillo, hay que ir a panel de control y una vez dentro tenemos que pinchar en activar o desactivar caracteristi as de windows, el siguiente paso es clicar en Hyper-V y también en espacio aislado de Windows, para crear un Sandbox.
 
