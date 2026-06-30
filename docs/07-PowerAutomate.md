@@ -1,5 +1,5 @@
-Documentación de los proyectos desarrollados con Microsoft Power Platform
-Introducción
+# Documentación de los proyectos desarrollados con Microsoft Power Platform
+## Introducción
 
 El objetivo de esta práctica ha sido desarrollar tres aplicaciones empresariales utilizando Microsoft Power Platform, integrando Microsoft Lists (SharePoint), Power Apps y Power Automate.
 
