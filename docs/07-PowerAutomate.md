@@ -1,179 +1,534 @@
-# Documentación de los proyectos desarrollados con Microsoft Power Platform
+# Microsoft Power Platform - Proyectos de Automatización
+
 ## Introducción
 
-El objetivo de esta práctica ha sido desarrollar tres aplicaciones empresariales utilizando Microsoft Power Platform, integrando Microsoft Lists (SharePoint), Power Apps y Power Automate.
+En esta práctica se han desarrollado tres aplicaciones utilizando **Microsoft Power Platform**, integrando las siguientes herramientas:
 
-En todos los proyectos se ha empleado Microsoft Lists como repositorio de datos, Power Apps para el desarrollo de la interfaz de usuario y Power Automate para automatizar procesos de negocio mediante flujos de trabajo.
+* **Microsoft Lists (SharePoint)** como base de datos.
+* **Power Apps** para el desarrollo de las aplicaciones.
+* **Power Automate** para automatizar los procesos de negocio.
 
-Proyecto 1. Gestor de incidencias informáticas
-Descripción
+Cada proyecto persigue digitalizar un proceso habitual dentro de una empresa mediante formularios, almacenamiento de información y automatizaciones.
 
-Se ha desarrollado una aplicación destinada a la gestión de incidencias informáticas de una organización.
+---
 
-Los usuarios pueden registrar nuevas incidencias mediante un formulario desarrollado en Power Apps. Cada incidencia queda almacenada automáticamente en una lista de Microsoft Lists, desde donde posteriormente puede ser gestionada.
+# Proyecto 1 - Gestor de incidencias informáticas
 
-El sistema contempla el ciclo completo de una incidencia, desde su creación hasta su resolución.
+## Objetivo
 
-Lista de SharePoint
+Desarrollar una aplicación que permita registrar incidencias informáticas y automatizar las notificaciones entre usuarios y técnicos.
 
-Se creó una lista denominada FlujoIncidencias con los siguientes campos:
+---
 
+## Arquitectura del proyecto
+
+```text
 Usuario
-Fecha de entrada
-Urgencia
-Asunto
-Cuerpo de la incidencia
-Fecha de resolución
-Cuerpo de la resolución
-Estado de la incidencia
-Aplicación Power Apps
+   │
+   ▼
+Power Apps
+   │
+   ▼
+Microsoft Lists
+   │
+   ├──────────────► Power Automate
+   │                    │
+   │                    ▼
+   │              Correo al técnico
+   │
+   └────────────────────► Actualización de la incidencia
+                                │
+                                ▼
+                         Correo al usuario
+```
 
-La aplicación permite:
+---
 
-Registrar nuevas incidencias.
-Consultar el listado de incidencias.
-Visualizar la información almacenada.
-Gestionar la información directamente sobre la lista de SharePoint.
+# Creación de la base de datos
 
-Toda la información introducida por el usuario es almacenada automáticamente en Microsoft Lists.
+Se creó una lista de SharePoint denominada **FlujoIncidencias**.
 
-Automatización mediante Power Automate
-Flujo 1. Aviso al técnico
+Las columnas creadas fueron:
 
-Cada vez que un usuario registra una nueva incidencia:
+| Campo            | Tipo             |
+| ---------------- | ---------------- |
+| Usuario          | Persona          |
+| FechaEntrada     | Fecha y hora     |
+| Urgencia         | Elección         |
+| Asunto           | Texto            |
+| CuerpoIncidencia | Texto multilínea |
+| FechaResolucion  | Fecha y hora     |
+| CuerpoResolucion | Texto multilínea |
+| EstadoIncidencia | Elección         |
 
-Se activa automáticamente el flujo.
-Se obtiene la información introducida en el formulario.
-Se envía un correo electrónico al técnico informático notificando la existencia de una nueva incidencia.
+---
 
-El correo contiene la información básica necesaria para comenzar su resolución.
+# Desarrollo de la aplicación
 
-Flujo 2. Notificación de resolución
+Desde **Power Apps** se seleccionó:
 
-Cuando una incidencia cambia su estado a Resuelta:
+```
+Crear
+      ↓
+Aplicación de lienzo
+      ↓
+Conectar origen de datos
+      ↓
+Microsoft Lists
+      ↓
+FlujoIncidencias
+```
 
-El flujo detecta la modificación del elemento.
-Comprueba el estado de la incidencia.
-Envía automáticamente un correo electrónico al usuario indicando que la incidencia ha sido resuelta.
-El correo incluye la resolución introducida por el técnico.
-Proyecto 2. Gestión de solicitudes de vacaciones
-Descripción
+Power Apps generó automáticamente:
 
-El segundo proyecto consiste en un sistema para gestionar solicitudes de vacaciones entre empleados y responsables.
+* Pantalla principal.
+* Pantalla de consulta.
+* Pantalla de edición.
+* Formulario de alta.
 
-Los empleados registran una solicitud mediante Power Apps mientras que la aprobación se realiza mediante Microsoft Teams utilizando el sistema de aprobaciones de Power Automate.
+Posteriormente se personalizó la aplicación modificando controles, títulos y botones de navegación.
 
-Finalmente, el sistema actualiza automáticamente el estado de la solicitud e informa al solicitante mediante correo electrónico.
+---
 
-Lista de SharePoint
+# Flujo 1 - Aviso al técnico
 
-Se creó una lista denominada ListaVacas con los siguientes campos:
+## Objetivo
 
+Cada vez que un usuario registre una incidencia, el técnico debe recibir un correo electrónico automáticamente.
+
+## Configuración
+
+### 1. Crear un flujo automatizado
+
+```
+Power Automate
+
+Crear
+
+Flujo automatizado
+```
+
+---
+
+### 2. Disparador
+
+Seleccionar:
+
+```
+Cuando se crea un elemento
+```
+
+Lista:
+
+```
+FlujoIncidencias
+```
+
+---
+
+### 3. Acción
+
+Agregar acción
+
+```
+Enviar correo electrónico (V2)
+```
+
+Configurar:
+
+* Destinatario: Técnico.
+* Asunto: Nueva incidencia registrada.
+* Cuerpo: Información obtenida de la lista mediante contenido dinámico.
+
+---
+
+# Flujo 2 - Resolución de incidencias
+
+## Objetivo
+
+Cuando la incidencia cambie su estado a **Resuelta**, el usuario recibirá un correo indicando que la incidencia ha finalizado.
+
+## Configuración
+
+### Disparador
+
+```
+Cuando se modifica un elemento
+```
+
+Lista:
+
+```
+FlujoIncidencias
+```
+
+---
+
+### Condición
+
+```
+EstadoIncidencia
+
+es igual que
+
+Resuelta
+```
+
+---
+
+### Rama "Sí"
+
+Agregar acción:
+
+```
+Enviar correo electrónico (V2)
+```
+
+Destinatario:
+
+```
+Usuario (Email)
+```
+
+El cuerpo del correo incluye:
+
+* Asunto.
+* Fecha de resolución.
+* Resolución de la incidencia.
+
+---
+
+# Proyecto 2 - Gestión de vacaciones
+
+## Objetivo
+
+Automatizar el proceso de solicitud y aprobación de vacaciones mediante Microsoft Teams.
+
+---
+
+## Arquitectura
+
+```text
 Empleado
-Fecha de inicio
-Fecha de fin
-Motivo
+
+Power Apps
+
+Microsoft Lists
+
+Power Automate
+
+Aprobación Teams
+
+Supervisor
+
+Actualizar estado
+
+Correo al empleado
+```
+
+---
+
+# Base de datos
+
+Lista:
+
+```
+ListaVacas
+```
+
+Campos:
+
+| Campo       | Tipo     |
+| ----------- | -------- |
+| Empleado    | Persona  |
+| FechaInicio | Fecha    |
+| FechaFin    | Fecha    |
+| Motivo      | Texto    |
+| Estado      | Elección |
+
+Opciones del estado:
+
+* Pendiente
+* Aceptada
+* Rechazada
+
+---
+
+# Desarrollo de la aplicación
+
+Se creó un formulario para registrar solicitudes y una pantalla para consultar el histórico.
+
+La información se almacena automáticamente en SharePoint.
+
+---
+
+# Flujo de aprobación
+
+## Paso 1
+
+Crear flujo automatizado.
+
+Disparador:
+
+```
+Cuando se crea un elemento
+```
+
+---
+
+## Paso 2
+
+Agregar acción:
+
+```
+Iniciar y esperar una aprobación
+```
+
+Tipo:
+
+```
+Aprobar / Rechazar
+```
+
+Responsable:
+
+Supervisor.
+
+---
+
+## Paso 3
+
+Agregar una condición.
+
+```
+Outcome
+
+es igual que
+
+Approve
+```
+
+---
+
+## Rama "Sí"
+
+Acciones:
+
+1. Enviar correo al empleado.
+2. Actualizar elemento.
+
+En la actualización se modifica:
+
+```
 Estado
-Aplicación Power Apps
 
-La aplicación permite:
+↓
 
-Registrar nuevas solicitudes de vacaciones.
-Consultar el histórico de solicitudes.
-Visualizar el estado de cada petición.
+Aceptada
+```
 
-Las solicitudes quedan almacenadas automáticamente en Microsoft Lists.
+---
 
-Automatización mediante Power Automate
-Flujo 1. Solicitud de aprobación
+## Rama "No"
 
-Cuando un empleado registra una solicitud:
+Acciones:
 
-Se inicia automáticamente un flujo de aprobación.
-El supervisor recibe una solicitud de aprobación mediante Microsoft Teams.
-El supervisor puede aprobar o rechazar la petición.
-Flujo 2. Comunicación del resultado
+1. Enviar correo indicando rechazo.
+2. Actualizar elemento.
 
-Tras la respuesta del supervisor:
+```
+Estado
 
-Si la solicitud es aprobada, el empleado recibe un correo electrónico de aceptación.
-Si la solicitud es rechazada, el empleado recibe un correo electrónico indicando el rechazo de la petición.
-Flujo 3. Actualización automática del estado
+↓
 
-En función de la respuesta obtenida durante la aprobación:
+Rechazada
+```
 
-Si el resultado es Approve, el campo Estado pasa a Aceptada.
-Si el resultado es Reject, el campo Estado pasa a Rechazada.
+De esta forma el estado de la solicitud queda sincronizado automáticamente con la decisión del supervisor.
 
-De esta forma el histórico de solicitudes permanece actualizado automáticamente sin intervención manual.
+---
 
-Proyecto 3. Control de visitas
-Descripción
+# Proyecto 3 - Control de visitas
 
-El tercer proyecto consiste en una aplicación destinada al control de visitantes que acceden a la empresa.
+## Objetivo
 
-La aplicación permite registrar la entrada de visitantes, consultar el histórico de visitas y registrar automáticamente tanto la hora de entrada como la hora de salida.
+Registrar las visitas realizadas a la empresa y controlar automáticamente su entrada y salida.
 
-Lista de SharePoint
+---
 
-Se creó una lista denominada VisitasEmpresa con los siguientes campos:
+## Arquitectura
 
-Nombre
-Empresa
-Persona a visitar
-Hora de entrada
-Hora de salida
-Estado de la visita
-Aplicación Power Apps
+```text
+Visitante
 
-La aplicación dispone de dos funcionalidades principales:
+Power Apps
 
-Registro de visitantes
+Microsoft Lists
 
-Permite registrar una nueva visita mediante un formulario.
+Power Automate
 
-Durante el registro:
+Correo bienvenida
 
-Se almacenan los datos del visitante.
-La hora de entrada se registra automáticamente mediante la función Now().
-El estado inicial de la visita se establece como Abierta.
-Histórico de visitas
+Finalizar visita
 
-La aplicación permite consultar todas las visitas registradas mostrando:
+Cierre automático
+```
 
-Visitante.
-Empresa.
-Persona visitada.
-Hora de entrada.
-Hora de salida.
-Estado de la visita.
+---
 
-Asimismo, incorpora un botón Finalizar visita, cuya finalidad es:
+# Base de datos
 
-Registrar automáticamente la hora de salida.
-Cambiar el estado de la visita a Finalizada.
-Automatización mediante Power Automate
-Flujo 1. Correo de bienvenida
+Lista:
 
-Cuando un visitante queda registrado:
+```
+VisitasEmpresa
+```
 
-Se activa automáticamente un flujo.
-Se envía un correo electrónico de bienvenida al visitante.
-El correo confirma el registro de la visita y proporciona la información básica de la misma.
-Flujo 2. Cierre automático de visitas
+Campos:
 
-Se implementa un flujo programado que se ejecuta diariamente al finalizar la jornada laboral.
+| Campo          | Tipo         |
+| -------------- | ------------ |
+| Nombre         | Texto        |
+| Empresa        | Texto        |
+| PersonaVisitar | Texto        |
+| HoraEntrada    | Fecha y hora |
+| HoraSalida     | Fecha y hora |
+| EstadoVisita   | Elección     |
 
-Durante su ejecución:
+Estados:
 
-Se obtienen todas las visitas cuyo estado continúa siendo Abierta.
-Se actualiza automáticamente la hora de salida con la fecha y hora actuales.
-El estado de la visita pasa a Finalizada.
+* Abierta
+* Finalizada
 
-Este proceso garantiza que ninguna visita permanezca abierta indefinidamente en el sistema.
+---
 
-Conclusiones
+# Desarrollo de la aplicación
 
-Los tres proyectos desarrollados permiten comprobar la integración existente entre Microsoft Lists, Power Apps y Power Automate para la creación de aplicaciones empresariales sin necesidad de programación tradicional.
+La aplicación dispone de dos funcionalidades principales.
 
-La utilización conjunta de estas herramientas permite centralizar la información, automatizar procesos repetitivos y mejorar la comunicación entre usuarios mediante notificaciones automáticas y flujos de aprobación, obteniendo soluciones funcionales orientadas a la digitalización de procesos administrativos.
+## Registro de visitantes
+
+El usuario introduce:
+
+* Nombre.
+* Empresa.
+* Persona a visitar.
+
+Los campos **HoraEntrada** y **EstadoVisita** se generan automáticamente mediante Power Apps utilizando la función:
+
+```PowerApps
+Now()
+```
+
+El estado inicial queda establecido como:
+
+```
+Abierta
+```
+
+---
+
+## Histórico
+
+La aplicación incorpora una pantalla de consulta donde pueden visualizarse todas las visitas registradas.
+
+---
+
+## Finalización manual
+
+Se añadió un botón denominado:
+
+```
+Finalizar visita
+```
+
+Al pulsarlo se ejecuta una actualización sobre el registro seleccionado que:
+
+* Guarda la hora actual como hora de salida.
+* Cambia el estado de la visita a **Finalizada**.
+
+---
+
+# Flujo de bienvenida
+
+## Disparador
+
+```
+Cuando se crea un elemento
+```
+
+Lista:
+
+```
+VisitasEmpresa
+```
+
+---
+
+## Acción
+
+```
+Enviar correo electrónico (V2)
+```
+
+El visitante recibe un correo de confirmación con:
+
+* Nombre.
+* Empresa.
+* Persona a visitar.
+* Hora de entrada.
+
+---
+
+# Flujo de cierre automático
+
+Para evitar que permanezcan visitas abiertas indefinidamente, se implementó un flujo programado.
+
+## Configuración
+
+Crear
+
+```
+Flujo programado
+```
+
+Frecuencia:
+
+```
+Diaria
+```
+
+Hora:
+
+```
+20:00
+```
+
+---
+
+## Obtener elementos
+
+Se obtienen todas las visitas cuyo estado sea:
+
+```
+Abierta
+```
+
+---
+
+## Actualizar elemento
+
+Para cada visita abierta:
+
+* HoraSalida = Fecha y hora actual.
+* EstadoVisita = Finalizada.
+
+Con ello se garantiza la consistencia de la información incluso cuando no se pulse manualmente el botón **Finalizar visita**.
+
+---
+
+# Conclusiones
+
+Los tres proyectos desarrollados demuestran la integración existente entre **Microsoft Lists**, **Power Apps** y **Power Automate** para construir aplicaciones empresariales sin necesidad de programación tradicional.
+
+La utilización conjunta de estas herramientas permite centralizar la información, automatizar procesos repetitivos, gestionar aprobaciones, enviar notificaciones automáticas y mantener actualizados los datos almacenados en SharePoint, proporcionando soluciones eficientes para la digitalización de procesos empresariales.
