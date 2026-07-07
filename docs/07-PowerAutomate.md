@@ -209,7 +209,8 @@ Una vez establecida la conexión, Power Apps consulta automáticamente todas las
 
 A partir de ese momento Power Apps comienza a generar automáticamente la aplicación.
 
-<img width="2000" height="1125" alt="image" src="https://github.com/user-attachments/assets/64907f4e-d6f3-4351-885a-a43f67cfd394" />
+<img width="960" height="600" alt="image" src="https://github.com/user-attachments/assets/a70a27c6-fd1f-4b1b-9996-0a8777c322d3" />
+
 
 
 ---
@@ -346,7 +347,8 @@ Una vez seleccionado, se tiene que configrurar la conexión indicando el sitio d
 
 A partir de ese momento, cada nueva incidencia registrada desde Power Apps activa inmediatamente el flujo.
 
-<img width="1962" height="1125" alt="image" src="https://github.com/user-attachments/assets/02d629fd-0429-4ab7-8d8e-5048349f1ce4" />
+<img width="1800" height="1125" alt="image" src="https://github.com/user-attachments/assets/7388dab2-c290-418e-a74b-0295d842119b" />
+
 
 
 ---
