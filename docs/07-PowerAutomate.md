@@ -2,51 +2,150 @@
 
 ## Introducción
 
-El objetivo de esta práctica ha sido desarrollar varias aplicaciones utilizando Microsoft Power Platform para automatizar distintos procesos habituales dentro de una empresa. En todos los casos se ha utilizado la misma arquitectura de trabajo, combinando una aplicación desarrollada con Power Apps, una lista de Microsoft Lists como base de datos y uno o varios flujos de Power Automate para automatizar tareas que normalmente deberían realizarse de forma manual.
+El objetivo de esta práctica ha sido desarrollar una serie de aplicaciones utilizando Microsoft Power Platform con el propósito de automatizar distintos procesos habituales dentro de una empresa. Para ello se han integrado tres de las herramientas más utilizadas dentro del ecosistema Microsoft 365: **Microsoft Lists**, **Power Apps** y **Power Automate**.
 
-Las aplicaciones desarrolladas han sido las siguientes:
+Aunque cada uno de los proyectos aborda una necesidad diferente, todos comparten la misma arquitectura de funcionamiento. En primer lugar, el usuario interactúa con una aplicación desarrollada en Power Apps. La información introducida se almacena automáticamente en una lista de Microsoft Lists, que actúa como base de datos. Finalmente, Power Automate monitoriza dicha información y ejecuta las automatizaciones necesarias según el estado o los cambios producidos en cada registro.
+
+Esta forma de trabajar permite separar claramente cada una de las responsabilidades del sistema. Power Apps se encarga de ofrecer una interfaz sencilla para el usuario, Microsoft Lists almacena toda la información de forma estructurada y Power Automate automatiza aquellas tareas que anteriormente requerían intervención manual.
+
+Los proyectos desarrollados han sido los siguientes:
 
 * Gestor de incidencias informáticas.
 * Gestión de solicitudes de vacaciones.
 * Control de visitas a la empresa.
 
-Cada uno de estos proyectos es independiente, aunque todos comparten la misma filosofía de funcionamiento: recoger información mediante un formulario, almacenarla en SharePoint y automatizar acciones según el estado de los registros.
+En los siguientes apartados se documenta el proceso completo de desarrollo de cada uno de ellos.
 
 ---
 
 # Proyecto 1. Gestor de incidencias informáticas
 
-## Descripción
+## Objetivo del proyecto
 
-El primer proyecto consiste en el desarrollo de una aplicación para gestionar incidencias informáticas de una empresa.
+El primer proyecto consiste en el desarrollo de una pequeña aplicación para gestionar incidencias informáticas.
 
-La finalidad es que cualquier usuario pueda registrar una incidencia desde una interfaz sencilla sin necesidad de acceder directamente a SharePoint. Una vez registrada, la incidencia queda almacenada automáticamente en una lista de Microsoft Lists y, a partir de ese momento, Power Automate se encarga de notificar al personal técnico y de informar posteriormente al usuario cuando la incidencia haya sido resuelta.
+Aunque existen numerosas soluciones profesionales para este tipo de sistemas (como Jira Service Management, ServiceNow o GLPI), el objetivo de esta práctica no es replicar todas sus funcionalidades, sino comprender cómo desarrollar una solución básica utilizando exclusivamente herramientas de Microsoft Power Platform.
 
-El proceso completo puede resumirse de la siguiente forma:
+En un entorno empresarial real un gestor de incidencias suele incorporar muchas más funcionalidades que las implementadas en esta práctica. Entre ellas pueden encontrarse la asignación automática de técnicos, clasificación por categorías, niveles de prioridad, tiempos máximos de resolución (SLA), seguimiento del tiempo invertido, historial de actuaciones, archivos adjuntos, comentarios internos, generación de informes o integración con sistemas de inventario.
 
-```
-Usuario
-     │
-     ▼
-Power Apps
-     │
-     ▼
-Microsoft Lists
-     │
-     ▼
-Power Automate
-     │
-     ├── Correo al técnico
-     └── Correo al usuario cuando la incidencia se resuelve
-```
+Sin embargo, para comprender el funcionamiento de Power Apps y Power Automate resulta más adecuado comenzar con un proceso simplificado que permita entender cómo interactúan las distintas herramientas sin añadir una complejidad innecesaria.
+
+El sistema desarrollado permite registrar incidencias, almacenarlas de forma estructurada, notificar automáticamente al personal técnico cuando aparece una nueva incidencia y avisar al usuario cuando esta queda resuelta.
 
 ---
 
-# Creación de la lista de SharePoint
+# Análisis previo
 
-El primer paso consistió en crear una lista nueva desde Microsoft Lists.
+Antes de desarrollar cualquier aplicación es recomendable realizar un pequeño análisis del proceso que se desea digitalizar.
 
-Una vez creada, se añadieron las columnas necesarias para almacenar toda la información relacionada con cada incidencia.
+Uno de los errores más habituales consiste en comenzar directamente a crear formularios o automatizaciones sin haber definido previamente qué información será necesaria almacenar y cómo va a circular esa información entre los distintos usuarios.
+
+En este caso el proceso es relativamente sencillo.
+
+Un usuario detecta un problema informático y accede a la aplicación para registrar una incidencia. Esa información debe almacenarse de forma estructurada para poder consultarla posteriormente y permitir que el técnico encargado pueda gestionarla.
+
+Cuando aparece una nueva incidencia el técnico debe ser informado automáticamente para poder comenzar su resolución. Finalmente, una vez solucionado el problema, el usuario debe recibir una notificación indicando que la incidencia ha sido resuelta.
+
+Este flujo puede representarse de forma resumida mediante el siguiente esquema:
+
+```text
+Usuario registra incidencia
+            │
+            ▼
+      Power Apps
+            │
+            ▼
+    Microsoft Lists
+            │
+            ▼
+     Power Automate
+            │
+     ┌──────┴──────┐
+     ▼             ▼
+Aviso técnico   Aviso usuario
+```
+
+Aunque el proceso resulta sencillo, dedicar unos minutos a definir este flujo facilita enormemente el desarrollo posterior, ya que permite identificar qué información será necesaria en cada etapa y qué automatizaciones deberán implementarse posteriormente.
+
+---
+
+# Diseño de la base de datos
+
+Una vez definido el flujo de trabajo, el siguiente paso consiste en diseñar la estructura donde se almacenará toda la información.
+
+En Power Platform la forma más sencilla de hacerlo es mediante **Microsoft Lists**, ya que permite crear bases de datos de forma visual sin necesidad de utilizar gestores de bases de datos tradicionales.
+<img width="2000" height="1136" alt="image" src="https://github.com/user-attachments/assets/c2066cdf-fd1f-486f-a48e-c9578454997e" />
+
+Para crear una nueva lista basta con acceder a Microsoft Lists utilizando la cuenta corporativa o educativa y seleccionar la opción **Crear nueva lista**. A continuación la plataforma solicita un nombre para la lista y genera automáticamente una estructura vacía sobre la que posteriormente podrán añadirse todas las columnas necesarias.
+
+Aunque crear una lista es un proceso muy rápido, probablemente sea una de las fases más importantes del desarrollo. Una estructura bien diseñada facilita enormemente el trabajo posterior en Power Apps y Power Automate, mientras que una mala elección de los campos puede obligar a modificar toda la aplicación cuando el desarrollo ya está avanzado.
+
+Por este motivo, antes de añadir ninguna columna conviene responder a algunas preguntas:
+
+* ¿Qué información necesita introducir realmente el usuario?
+* ¿Qué información utilizarán posteriormente los técnicos?
+* ¿Qué datos serán necesarios para automatizar el proceso?
+* ¿Qué campos podrán utilizarse posteriormente para realizar búsquedas o filtros?
+
+Responder previamente a estas cuestiones evita incorporar información innecesaria y ayuda a mantener una estructura sencilla y coherente.
+
+---
+
+# Selección de los tipos de datos
+
+Además de decidir qué información almacenar, también es importante seleccionar correctamente el tipo de dato asociado a cada columna.
+
+Esta decisión no solamente afecta a la forma en la que Microsoft Lists almacena la información, sino también al comportamiento que tendrán posteriormente Power Apps y Power Automate.
+
+Los tipos de datos más utilizados durante este proyecto han sido los siguientes.
+
+### Texto
+
+Se utiliza cuando únicamente es necesario almacenar una cadena de caracteres sencilla, como puede ser un asunto o un nombre.
+
+Este tipo de campo permite búsquedas rápidas y resulta adecuado para información breve.
+
+### Texto de varias líneas
+
+Cuando el usuario necesita escribir una descripción más extensa, como ocurre con el cuerpo de una incidencia, resulta más apropiado utilizar un campo de texto multilínea.
+
+Esto mejora la experiencia del usuario durante la introducción de información y facilita posteriormente la lectura del contenido.
+
+### Persona
+
+Uno de los tipos de dato más interesantes que ofrece Microsoft Lists es el campo **Persona**.
+
+En lugar de almacenar únicamente un nombre escrito manualmente, este tipo de columna se conecta directamente con los usuarios existentes dentro del entorno Microsoft 365.
+
+Gracias a ello Power Apps puede mostrar automáticamente un selector de usuarios y Power Automate tiene acceso a información adicional como el nombre completo, el correo electrónico o el identificador del usuario.
+
+Esta característica resulta especialmente útil cuando posteriormente se necesita enviar notificaciones por correo electrónico sin que el usuario tenga que escribir manualmente su dirección.
+
+### Fecha y hora
+
+Los campos de fecha permiten registrar momentos concretos dentro del proceso.
+
+En este proyecto se utilizan para almacenar la fecha de creación de la incidencia y la fecha de resolución.
+
+Además de facilitar consultas posteriores, permiten conocer el tiempo transcurrido entre la apertura y la resolución de cada incidencia.
+
+### Elección
+
+Los campos de tipo **Elección** permiten limitar las respuestas posibles a un conjunto previamente definido.
+
+Su utilización resulta especialmente recomendable cuando únicamente existen unas pocas opciones válidas, ya que evita errores de escritura y mantiene la información homogénea en todos los registros.
+
+En este proyecto se utilizaron para los niveles de urgencia y para el estado de la incidencia.
+
+Elegir correctamente cada tipo de dato desde el principio reduce considerablemente la complejidad del desarrollo posterior y evita tener que realizar modificaciones cuando la aplicación ya está terminada.
+
+---
+
+# Creación de la lista
+
+Una vez definida la estructura de la información, se procedió a crear la lista **FlujoIncidencias**.
+
+Las columnas utilizadas fueron las siguientes:
 
 | Columna          | Tipo                   |
 | ---------------- | ---------------------- |
@@ -59,53 +158,159 @@ Una vez creada, se añadieron las columnas necesarias para almacenar toda la inf
 | CuerpoResolucion | Texto de varias líneas |
 | EstadoIncidencia | Elección               |
 
-En la columna **Urgencia** se configuraron los siguientes valores:
+Para el campo **Urgencia** se configuraron cuatro niveles:
 
 * Baja
 * Media
 * Alta
 * Crítica
 
-Mientras que en la columna **EstadoIncidencia** se establecieron los estados habituales de una incidencia:
+Mientras que el campo **EstadoIncidencia** quedó definido con los siguientes valores:
 
 * Pendiente
 * En proceso
 * Resuelta
 
-Con esta lista ya se dispone de una base de datos donde almacenar todas las incidencias registradas por los usuarios.
+Con esta estructura ya se dispone de una base de datos completamente funcional sobre la que desarrollar el resto del proyecto.
+
+
 
 ---
 
-# Desarrollo de la aplicación en Power Apps
+# Desarrollo de la aplicación con Power Apps
 
-Una vez preparada la lista, se creó la aplicación desde Power Apps utilizando como origen de datos la lista creada anteriormente.
+Una vez diseñada la base de datos en Microsoft Lists, el siguiente paso consiste en desarrollar la aplicación que utilizarán los usuarios para registrar las incidencias. Una de las principales ventajas de Power Apps es que permite generar una aplicación completamente funcional a partir de una lista ya existente, reduciendo enormemente el tiempo de desarrollo.
 
-Para ello se siguieron los siguientes pasos:
+## Creación de la aplicación
 
-1. Acceder al portal de **Power Apps**.
-2. Seleccionar la opción **Crear**.
-3. Elegir **Aplicación de lienzo**.
-4. Seleccionar **Comenzar con datos**.
-5. Elegir **Microsoft Lists** como origen de datos.
-6. Conectar la lista **FlujoIncidencias**.
+Para comenzar, se accede al portal de **Power Apps** utilizando la misma cuenta de Microsoft 365 con la que se creó previamente la lista.
 
-Power Apps genera automáticamente una aplicación completamente funcional compuesta por varias pantallas:
+Desde la pantalla principal se selecciona la opción **Crear** y, dentro de las distintas alternativas disponibles, se elige **Comenzar con datos**. Esta opción permite crear una aplicación utilizando como origen una base de datos ya existente.
 
-* Pantalla principal con el listado de incidencias.
-* Pantalla de visualización del detalle.
-* Pantalla de creación y edición.
+En la siguiente ventana Power Apps solicita seleccionar el origen de datos. En este caso se selecciona **SharePoint**, ya que Microsoft Lists utiliza internamente esta tecnología para almacenar toda la información.
 
-A partir de esa estructura inicial se realizaron pequeñas modificaciones para adaptar la aplicación a las necesidades de la práctica, modificando títulos, controles y botones de navegación.
+El asistente solicita la dirección del sitio de SharePoint donde se encuentra alojada la lista. Es importante indicar únicamente la dirección del sitio y **no la URL completa de la lista**.
 
-El formulario quedó conectado directamente con Microsoft Lists, de manera que cada vez que un usuario registra una incidencia mediante el botón **Guardar**, toda la información pasa automáticamente a la lista de SharePoint.
+Por ejemplo, si la dirección de la lista fuese:
+
+```text
+https://empresa-my.sharepoint.com/personal/usuario_empresa_com/Lists/FlujoIncidencias
+```
+
+la dirección que debe introducirse en Power Apps sería únicamente:
+
+```text
+https://empresa-my.sharepoint.com/personal/usuario_empresa_com
+```
+
+Una vez establecida la conexión, Power Apps consulta automáticamente todas las listas disponibles dentro de ese sitio de SharePoint y muestra un listado con ellas.
+
+Únicamente hay que seleccionar la lista **FlujoIncidencias** y pulsar **Conectar**.
+
+A partir de ese momento Power Apps comienza a generar automáticamente la aplicación.
+
+<img width="2000" height="1125" alt="image" src="https://github.com/user-attachments/assets/64907f4e-d6f3-4351-885a-a43f67cfd394" />
+
 
 ---
 
-# Automatización mediante Power Automate
+## Generación automática de la interfaz
 
-Una vez terminada la aplicación, el siguiente paso fue automatizar parte del proceso utilizando Power Automate.
+Tras analizar la estructura de la lista, Power Apps crea prácticamente toda la aplicación de forma automática.
 
-En este proyecto se desarrollaron dos flujos diferentes.
+La herramienta interpreta el tipo de cada columna y selecciona el control visual más adecuado para representar cada dato.
+
+Por ejemplo:
+
+* Los campos de texto aparecen como cajas de texto.
+* Los campos de varias líneas generan cuadros de escritura más amplios.
+* Los campos de tipo **Persona** muestran un selector conectado directamente al directorio de Microsoft 365.
+* Los campos de tipo **Elección** aparecen como listas desplegables con todas las opciones definidas previamente en Microsoft Lists.
+* Los campos de fecha utilizan automáticamente un selector de calendario.
+
+Gracias a ello no es necesario programar manualmente la mayor parte de la interfaz, ya que Power Apps adapta automáticamente el formulario a la estructura de la lista.
+
+Además del formulario, la aplicación incorpora de forma automática una pantalla principal con un listado de todas las incidencias registradas y otra pantalla destinada a visualizar el detalle de cada una de ellas.
+
+En pocos segundos se obtiene una aplicación completamente funcional capaz de crear, consultar y modificar registros almacenados en Microsoft Lists.
+
+---
+
+## Organización del proyecto
+
+Durante el desarrollo, Power Apps organiza todos los elementos de la aplicación mediante una estructura en forma de árbol situada en el panel izquierdo de la pantalla.
+
+En dicho árbol aparecen todas las pantallas de la aplicación junto con cada uno de los controles que contiene.
+
+Normalmente encontraremos una estructura similar a la siguiente:
+
+```text
+App
+
+├── BrowseScreen
+│     ├── Gallery
+│     ├── Botón Nuevo
+│     └── Barra de búsqueda
+│
+├── DetailScreen
+│     ├── Formulario de detalle
+│     └── Botones de navegación
+│
+└── EditScreen
+      ├── EditForm
+      ├── Botón Guardar
+      └── Botón Cancelar
+```
+
+Esta organización facilita localizar rápidamente cualquier componente de la aplicación y permite modificarlo sin necesidad de buscarlo directamente sobre la interfaz gráfica.
+
+---
+
+## Personalización de la aplicación
+
+Aunque la aplicación generada automáticamente es completamente funcional, normalmente será necesario realizar pequeñas modificaciones para adaptarla a las necesidades del proyecto.
+
+Todas estas personalizaciones pueden realizarse desde el panel izquierdo seleccionando el control correspondiente.
+
+Entre las modificaciones más habituales se encuentran:
+
+* Cambiar el nombre de las pantallas.
+* Modificar los títulos mostrados al usuario.
+* Cambiar el orden de los campos del formulario.
+* Ocultar columnas que no deban editarse manualmente.
+* Añadir nuevos botones de navegación.
+* Cambiar textos, tamaños y posiciones de los controles.
+* Modificar colores o aspectos visuales de la aplicación.
+
+La mayoría de estos cambios pueden realizarse sin escribir código, utilizando únicamente el panel de propiedades situado en la parte derecha del editor.
+
+Cuando es necesario incorporar alguna funcionalidad adicional, Power Apps permite configurar el comportamiento de cada control mediante expresiones escritas en la barra de fórmulas situada en la parte superior de la ventana.
+
+---
+
+## Aplicación completamente funcional
+
+Una vez conectada la lista y realizadas las pequeñas personalizaciones necesarias, la aplicación queda completamente operativa.
+
+Cada vez que un usuario rellena el formulario y pulsa el botón **Guardar**, Power Apps envía automáticamente toda la información a Microsoft Lists.
+
+Del mismo modo, cualquier modificación realizada sobre un registro queda reflejada inmediatamente en la lista sin necesidad de realizar sincronizaciones manuales.
+
+En este punto puede considerarse finalizado el desarrollo de la aplicación. La siguiente fase del proyecto consiste en incorporar la automatización mediante Power Automate, encargándose de enviar las notificaciones correspondientes cuando se produzcan los distintos eventos definidos durante el diseño del sistema.
+
+---
+
+# Automatización del proceso con Power Automate
+
+Una vez finalizado el desarrollo de la aplicación, el siguiente paso consistió en automatizar aquellas tareas que hasta ese momento seguirían dependiendo de la intervención manual de los usuarios.
+
+Uno de los principales objetivos de Power Automate es precisamente eliminar este tipo de tareas repetitivas, permitiendo que determinadas acciones se ejecuten automáticamente cuando ocurre un evento concreto dentro del sistema.
+
+En este proyecto se implementaron dos automatizaciones diferentes.
+
+La primera de ellas se encarga de informar al técnico responsable cada vez que se registra una nueva incidencia, mientras que la segunda notifica al usuario cuando dicha incidencia ha sido resuelta.
+
+De esta forma, la comunicación entre ambas partes se produce de manera completamente automática, sin necesidad de revisar continuamente la lista de SharePoint.
 
 ---
 
@@ -113,89 +318,103 @@ En este proyecto se desarrollaron dos flujos diferentes.
 
 ## Objetivo
 
-El propósito de este flujo es informar automáticamente al técnico responsable cada vez que un usuario registra una nueva incidencia.
+El objetivo de este flujo es reducir el tiempo que transcurre entre la creación de una incidencia y el momento en el que el técnico tiene conocimiento de ella.
 
-De esta forma se evita que el técnico tenga que revisar continuamente la lista para comprobar si existen nuevas incidencias pendientes.
+En un proceso manual, el técnico tendría que acceder periódicamente a la lista de incidencias para comprobar si existen nuevas solicitudes pendientes de atender. A medida que aumenta el número de usuarios, este sistema deja de ser eficiente y resulta fácil que alguna incidencia pase desapercibida.
+
+Mediante Power Automate es posible evitar esta situación haciendo que sea el propio sistema quien notifique automáticamente la existencia de una nueva incidencia en el mismo instante en el que esta queda registrada.
 
 ---
 
 ## Creación del flujo
 
-Desde Power Automate se seleccionó la opción:
+Desde el portal de Power Automate se seleccionó la opción **Crear** y posteriormente **Flujo automatizado**.
 
-```
-Crear
+Durante la creación del flujo es necesario elegir un desencadenador, es decir, el evento que provocará el inicio de la automatización.
 
-↓
+En este caso se seleccionó el desencadenador:
 
-Flujo automatizado
-```
-
-Como desencadenador se utilizó:
-
-```
+```text
 Cuando se crea un elemento
 ```
 
-A continuación se configuró la conexión con la lista **FlujoIncidencias**, indicando tanto el sitio de SharePoint como la lista correspondiente.
+Este desencadenador resulta el más adecuado porque únicamente debe ejecutarse cuando un usuario registra una incidencia nueva.
 
-Una vez configurado el desencadenador, se añadió una nueva acción seleccionando:
+Una vez seleccionado, se configuró la conexión indicando el sitio de SharePoint y la lista **FlujoIncidencias**, de manera que Power Automate pudiera supervisar automáticamente cualquier nuevo registro que apareciese en dicha lista.
 
-```
+A partir de ese momento, cada nueva incidencia registrada desde Power Apps activa inmediatamente el flujo.
+
+---
+
+## Envío de la notificación
+
+Tras el desencadenador se añadió la acción:
+
+```text
 Enviar correo electrónico (V2)
 ```
 
-En esta acción se configuró:
+Esta acción permite generar un correo electrónico completamente dinámico utilizando la información recibida desde el propio desencadenador.
 
-**Destinatario**
+En lugar de escribir manualmente el contenido del mensaje, Power Automate ofrece el denominado **contenido dinámico**, que permite insertar automáticamente valores procedentes del elemento que acaba de crearse.
 
-Correo electrónico del técnico.
+Gracias a ello cada correo contiene exactamente la información correspondiente a la incidencia registrada.
 
-**Asunto**
+En este proyecto se incorporaron los siguientes datos:
 
-```
-Nueva incidencia registrada
-```
-
-**Cuerpo del mensaje**
-
-El cuerpo del correo utiliza el contenido dinámico proporcionado por Power Automate para incluir automáticamente información como:
-
-* Usuario que registra la incidencia.
+* Usuario que ha registrado la incidencia.
 * Fecha de creación.
 * Nivel de urgencia.
 * Asunto.
 * Descripción de la incidencia.
 
-De esta forma, el técnico recibe toda la información necesaria sin necesidad de acceder inicialmente a la aplicación.
+El destinatario del mensaje corresponde al técnico responsable del soporte informático.
+
+Como resultado, cada vez que un usuario crea una incidencia desde la aplicación, el técnico recibe inmediatamente un correo electrónico con toda la información necesaria para comenzar su resolución.
+
+Este proceso se ejecuta de forma completamente automática y no requiere ninguna intervención adicional.
 
 ---
 
-# Flujo 2. Aviso al usuario cuando la incidencia se resuelve
+# Flujo 2. Notificación al usuario tras la resolución
 
 ## Objetivo
 
-El segundo flujo tiene como finalidad informar automáticamente al usuario cuando su incidencia ha sido solucionada.
+Una vez registrada una incidencia comienza el trabajo del técnico.
 
-Este flujo únicamente debe ejecutarse cuando el estado de la incidencia pase a **Resuelta**.
+Cuando este consigue resolver el problema, resulta conveniente informar automáticamente al usuario para evitar que tenga que consultar continuamente el estado de su solicitud.
+
+El segundo flujo desarrollado tiene precisamente esta finalidad.
+
+Su misión consiste en detectar cuándo una incidencia pasa al estado **Resuelta** y comunicar automáticamente dicha información al usuario.
 
 ---
 
-## Configuración
+## Configuración del desencadenador
 
-Se creó un nuevo flujo automatizado utilizando como desencadenador:
+Al contrario que el flujo anterior, en este caso no interesa detectar la creación de nuevos elementos, sino las modificaciones que se producen sobre ellos.
 
-```
+Por ese motivo el flujo utiliza el desencadenador:
+
+```text
 Cuando se modifica un elemento
 ```
 
-Al igual que en el flujo anterior, se seleccionó la lista **FlujoIncidencias** como origen de datos.
+Este desencadenador permite supervisar cualquier cambio realizado sobre los registros de la lista.
 
-Después del desencadenador se añadió una acción **Condición**.
+Sin embargo, no todas las modificaciones deben generar una notificación.
 
-La condición comprueba el valor del campo **EstadoIncidencia**.
+Para evitar envíos innecesarios se añadió inmediatamente una acción **Condición**.
 
-```
+---
+
+## Evaluación del estado
+
+La condición comprueba el contenido del campo **EstadoIncidencia**.
+
+La comparación utilizada fue la siguiente:
+
+```text
 EstadoIncidencia
 
 es igual que
@@ -203,23 +422,71 @@ es igual que
 Resuelta
 ```
 
-Si la condición se cumple, Power Automate ejecuta la rama **Sí**, donde se añade una acción de envío de correo electrónico.
+Esta comprobación garantiza que el correo únicamente será enviado cuando la incidencia haya finalizado realmente.
 
-El destinatario corresponde al usuario que creó la incidencia y el mensaje informa de que la incidencia ha sido resuelta.
+Si el técnico modifica cualquier otro dato de la incidencia sin cambiar su estado, el flujo finalizará sin realizar ninguna acción adicional.
 
-Además del aviso, el correo incorpora información adicional obtenida directamente de la lista, como el asunto de la incidencia, la fecha de resolución y el texto introducido por el técnico en el campo correspondiente a la resolución.
+---
 
-En caso de que el estado todavía no sea **Resuelta**, el flujo no realiza ninguna acción y finaliza su ejecución.
+## Envío del correo al usuario
+
+Cuando la condición se cumple, Power Automate ejecuta la rama afirmativa del flujo.
+
+En esta rama se añadió nuevamente la acción:
+
+```text
+Enviar correo electrónico (V2)
+```
+
+En este caso el destinatario ya no es el técnico, sino el propio usuario que registró la incidencia.
+
+Gracias al uso del campo de tipo **Persona** creado previamente en Microsoft Lists, Power Automate obtiene automáticamente la dirección de correo electrónico del usuario utilizando el contenido dinámico, sin necesidad de almacenarla manualmente en la aplicación.
+
+El correo informa de que la incidencia ha sido resuelta e incorpora información adicional procedente de la lista, como:
+
+* Asunto de la incidencia.
+* Fecha de resolución.
+* Comentarios o explicación introducida por el técnico.
+
+De este modo el usuario recibe toda la información necesaria sin tener que acceder nuevamente a la aplicación.
+
+---
+
+# Funcionamiento conjunto de ambos flujos
+
+Aunque los dos flujos son independientes, ambos trabajan sobre la misma lista de Microsoft Lists y forman parte del mismo proceso de gestión.
+
+El primero actúa en el momento en que una incidencia entra en el sistema, notificando al personal técnico.
+
+El segundo interviene cuando la incidencia finaliza, comunicando el resultado al usuario.
+
+Entre ambos automatizan completamente el proceso de comunicación, eliminando la necesidad de realizar avisos manuales y garantizando que todas las incidencias sigan el mismo ciclo de funcionamiento.
 
 ---
 
 # Resultado obtenido
 
-Tras integrar Power Apps, Microsoft Lists y Power Automate se obtuvo un sistema completamente funcional para la gestión de incidencias.
+El resultado final es una aplicación plenamente funcional para la gestión de incidencias informáticas.
 
-El usuario únicamente necesita rellenar un formulario para registrar una incidencia, mientras que el resto del proceso se realiza de forma automática.
+El usuario únicamente necesita acceder a Power Apps, rellenar el formulario y guardar la incidencia.
 
-Las notificaciones permiten mantener informados tanto al técnico como al usuario durante todo el ciclo de vida de la incidencia, reduciendo el trabajo manual y mejorando el seguimiento de cada solicitud.
+A partir de ese momento, el resto del proceso se desarrolla de forma automática.
+
+La incidencia queda almacenada en Microsoft Lists, el técnico recibe un aviso inmediato para comenzar su gestión y, una vez resuelta, el usuario recibe una notificación indicando que su solicitud ha sido atendida.
+
+La integración entre Power Apps, Microsoft Lists y Power Automate permite así construir un sistema sencillo pero perfectamente operativo, demostrando cómo es posible automatizar procesos habituales de una empresa utilizando herramientas de bajo código.
+
+---
+
+# Conclusiones del proyecto
+
+Este primer proyecto ha servido para comprender el funcionamiento conjunto de las principales herramientas que forman parte de Microsoft Power Platform.
+
+A pesar de tratarse de una aplicación sencilla, durante su desarrollo se han trabajado conceptos fundamentales como el diseño previo de una base de datos, la selección de los tipos de datos más adecuados, la creación de formularios mediante Power Apps y la automatización de procesos utilizando Power Automate.
+
+Además, el proyecto pone de manifiesto la importancia de diseñar correctamente el flujo de información antes de comenzar el desarrollo. Una buena planificación inicial facilita enormemente la creación de la aplicación y reduce la necesidad de realizar modificaciones posteriores.
+
+Aunque el gestor desarrollado constituye una versión simplificada de un sistema de gestión de incidencias profesional, la estructura implementada puede ampliarse fácilmente incorporando nuevas funcionalidades, como asignación automática de técnicos, prioridades dinámicas, tiempos máximos de resolución, adjuntos, comentarios internos o paneles de seguimiento, manteniendo la misma arquitectura utilizada durante esta práctica.
 
 
 ---
