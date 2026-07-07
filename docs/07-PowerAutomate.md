@@ -286,6 +286,8 @@ La mayoría de estos cambios pueden realizarse sin escribir código, utilizando 
 
 Cuando es necesario incorporar alguna funcionalidad adicional, Power Apps permite configurar el comportamiento de cada control mediante expresiones escritas en la barra de fórmulas situada en la parte superior de la ventana.
 
+<img width="1940" height="923" alt="image" src="https://github.com/user-attachments/assets/37d10937-596a-4272-b553-4a7363513a48" />
+
 ---
 
 ## Aplicación completamente funcional
@@ -340,9 +342,12 @@ Cuando se crea un elemento
 
 Este desencadenador resulta el más adecuado porque únicamente debe ejecutarse cuando un usuario registra una incidencia nueva.
 
-Una vez seleccionado, se configuró la conexión indicando el sitio de SharePoint y la lista **FlujoIncidencias**, de manera que Power Automate pudiera supervisar automáticamente cualquier nuevo registro que apareciese en dicha lista.
+Una vez seleccionado, se tiene que configrurar la conexión indicando el sitio de SharePoint, que es el mismo que se ha utilizado con power apps y la lista **FlujoIncidencias**, de manera que Power Automate pudiera supervisar automáticamente cualquier nuevo registro que apareciese en dicha lista.
 
 A partir de ese momento, cada nueva incidencia registrada desde Power Apps activa inmediatamente el flujo.
+
+<img width="1962" height="1125" alt="image" src="https://github.com/user-attachments/assets/02d629fd-0429-4ab7-8d8e-5048349f1ce4" />
+
 
 ---
 
